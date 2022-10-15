@@ -46,4 +46,39 @@ async (req, res) =>{
     }
 })
 
+router.post('/login',[body('email','Enter a valide email').isEmail(),
+body('password','Password cannot be blank').exists()],
+
+async (req, res)=>{
+    const errors = validationResult(req);
+    if(!errors.isEmpty()){
+        return res.status(400).json({error: errors.array()});
+    }
+
+    const {email, password} = req.body;
+    try{
+        let user = await User.findOne({email});
+        if(!user){
+            return res.status(400).json({error: "You entered Invalide Credentials"});
+        }
+
+        let passwordCompare = await bcrypt.compare(password,user.password);
+        if(!passwordCompare){
+            return res.status(400).json({error: "You entered Invalid Credentials"});
+        }
+
+        const data = {
+            user: {
+                id: user.id
+            }
+        };
+
+        let authToken = jwt.sign(data, JWT_SCRETE);
+        res.json({authToken: authToken});
+    }
+    catch(error){
+        res.status(500).send("Internal server error occured");
+    }
+})
+
 module.exports = router;
