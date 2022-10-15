@@ -7,6 +7,10 @@ const Expense = require('../models/Expense');
 router.post('/dailyexpense', fetchuser,
 async (req, res) =>{
 
+    if(req.body.expense_tag.length !== req.body.amount.length){
+        return res.status(400).json({error: "Enter amount for all the field"})
+    }
+
     try{
 
         let {expense_tag, amount} = req.body;
