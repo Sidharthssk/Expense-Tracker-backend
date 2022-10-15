@@ -55,6 +55,16 @@ async (req, res)=>{
 
     dailyexpenseObj = await Dailyexpense.findByIdAndUpdate(req.params.id, {expenses: newExpenseObj}, {new: true});
     res.json({dailyexpenseObj});
+});
+
+router.get('/fetchdailyexpense', fetchuser, async(req, res)=>{
+    try{
+        const dailyexpenses = await Dailyexpense.find({user: req.user.id});
+        res.json(dailyexpenses);
+    }
+    catch(errors){
+        res.status(500).send(errors);
+    }
 })
 
 module.exports = router;
