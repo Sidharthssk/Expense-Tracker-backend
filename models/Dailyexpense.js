@@ -8,11 +8,6 @@ const DailyexpenseSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'user'
     },
-    date: {
-        type: Date,
-        default: Date.now,
-        unique: true
-    },
     expenses : {
         type: expense,
         required: true
