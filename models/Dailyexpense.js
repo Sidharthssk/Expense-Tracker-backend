@@ -11,6 +11,10 @@ const DailyexpenseSchema = new Schema({
     expenses : {
         type: expense,
         required: true
+    },
+    date: {
+        type: Date,
+        default: Date.now
     }
 });
 
