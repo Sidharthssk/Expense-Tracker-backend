@@ -21,7 +21,7 @@ async (req, res) =>{
             expense.expenses.expense_tag = expense.expenses.expense_tag.concat(expense_tag);
             expense.expenses.amount = expense.expenses.amount.concat(amount);
             expense = await expense.save();
-            return res.json({id: expense._id, expense: expense});
+            return res.json({id: expense._id, expense});
         }
     
         let expenseObj = new Expense({
