@@ -3,6 +3,7 @@ const fetchuser = require('../middleware/fetchUser');
 const Dailyexpense = require('../models/Dailyexpense');
 const router = express.Router();
 const Expense = require('../models/Expense');
+const moment = require('moment');
 
 router.post('/dailyexpense', fetchuser,
 async (req, res) =>{
@@ -14,6 +15,14 @@ async (req, res) =>{
     try{
 
         let {expense_tag, amount} = req.body;
+
+        let expense = await Dailyexpense.findOne({addedOn: moment().format('DD-MM-YYYY')});
+        if(expense){
+            expense.expenses.expense_tag = expense.expenses.expense_tag.concat(expense_tag);
+            expense.expenses.amount = expense.expenses.amount.concat(amount);
+            expense = await expense.save();
+            return res.json({id: expense._id, expense: expense});
+        }
     
         let expenseObj = new Expense({
             expense_tag: expense_tag,
