@@ -14,15 +14,17 @@ body('password','Password should be atleast 5 characters long').isLength({min: 5
 
 async (req, res) =>{
     const errors = validationResult(req);
+    let success = false;
+
     if (!errors.isEmpty()){
-        return res.status(400).json({error: errors.array()});
+        return res.status(400).json({success: success, error: errors.array()});
     }
 
     try{
         let user = await User.findOne({email: req.body.email});
 
         if(user){
-            return res.status(400).json({error: "A user with this email already exist"});
+            return res.status(400).json({success: success, error: "A user with this email already exist"});
         }
 
         const salt = await bcrypt.genSalt(10);
@@ -41,7 +43,9 @@ async (req, res) =>{
         };
 
         const authToken = jwt.sign(data, JWT_SCRETE);
-        res.json(authToken);
+        success = true;
+
+        res.json({success: success, authToken: authToken});
     }catch(error){
         res.status(500).send(error.message);
     }
@@ -51,21 +55,22 @@ router.post('/login',[body('email','Enter a valide email').isEmail(),
 body('password','Password cannot be blank').exists()],
 
 async (req, res)=>{
+    let success = false;
     const errors = validationResult(req);
     if(!errors.isEmpty()){
-        return res.status(400).json({error: errors.array()});
+        return res.status(400).json({success: success, error: errors.array()});
     }
 
     const {email, password} = req.body;
     try{
         let user = await User.findOne({email});
         if(!user){
-            return res.status(400).json({error: "You entered Invalide Credentials"});
+            return res.status(400).json({success: success, error: "You entered Invalide Credentials"});
         }
 
         let passwordCompare = await bcrypt.compare(password,user.password);
         if(!passwordCompare){
-            return res.status(400).json({error: "You entered Invalid Credentials"});
+            return res.status(400).json({success: success, error: "You entered Invalid Credentials"});
         }
 
         const data = {
@@ -75,7 +80,8 @@ async (req, res)=>{
         };
 
         let authToken = jwt.sign(data, JWT_SCRETE);
-        res.json({authToken: authToken});
+        success = true;
+        res.json({success: success, authToken: authToken});
     }
     catch(error){
         res.status(500).send("Internal server error occured");
