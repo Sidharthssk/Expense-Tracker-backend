@@ -16,13 +16,13 @@ async (req, res) =>{
 
         let {expense_tag, amount} = req.body;
 
-        // let expense = await Dailyexpense.findOne({addedOn: moment().format('DD-MM-YYYY')});
-        // if(expense){
-        //     expense.expenses.expense_tag = expense.expenses.expense_tag.concat(expense_tag);
-        //     expense.expenses.amount = expense.expenses.amount.concat(amount);
-        //     expense = await expense.save();
-        //     return res.json({id: expense._id, expense});
-        // }
+        let expense = await Dailyexpense.findOne({addedOn: moment().format('DD-MM-YYYY')});
+        if(expense){
+            expense.expenses.expense_tag = expense.expenses.expense_tag.concat(expense_tag);
+            expense.expenses.amount = expense.expenses.amount.concat(amount);
+            expense = await expense.save();
+            return res.json({id: expense._id, expense});
+        }
     
         let expenseObj = new Expense({
             expense_tag: expense_tag,
