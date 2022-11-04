@@ -1,7 +1,8 @@
 const connectToMongo = require('./db');
 const express = require('express');
 const cors = require('cors');
-require("dotenv").config()
+require("dotenv").config();
+const getExpense = require('./pdfHandlers/getExpense');
 
 connectToMongo();
 
@@ -11,7 +12,7 @@ const port = process.env.PORT || 8000;
 app.use(express.json());
 app.use(cors())
 
-
+getExpense();
 
 // Available Routes
 app.use('/api/auth', require('./routes/auth'));
