@@ -19,7 +19,8 @@
     "jspdf": "^2.5.1",
     "jspdf-autotable": "^3.5.25",
     "moment": "^2.29.4",
-    "mongoose": "^6.6.5"
+    "mongoose": "^6.6.5",
+    "nodemailer": "^6.8.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.20"

@@ -1,4 +1,4 @@
-const {jspdf} = require('jspdf');
+const {jsPDF} = require('jspdf');
 const getExpense = require('./getExpense');
 const moment = require('moment');
 require('jspdf-autotable');
@@ -26,11 +26,13 @@ const createPDF = async(user) =>{
     let monthIndex = new Date().getMonth();
     let monthName = monthNames[monthIndex];
 
-    const unit = "pt";
-    const size = "A4";
-    const orientation = "portrait"
+    
 
-    const doc = new jspdf(unit, size, orientation);
+    const doc = new jsPDF({
+        orientation: "portrait", 
+        unit: "pt", 
+        format: "a4", 
+      });
 
     doc.setFontSize(15);
 
@@ -44,11 +46,16 @@ const createPDF = async(user) =>{
     let expensesData = [];
 
     let expenses = await getExpense(user);
+    const calculateSum = (amount)=>{
+        let sum = 0;
+        for(let i=0;i<amount.length;i++) sum+=amount[i];
+        return sum;
+        }
     expenses = expenses.filter((expense)=>{
         return new Date(expense.date).getMonth() === monthIndex;
     });
     expensesData = expenses.map((expense, index)=>{
-        return [index+1, getFormattedDate(expense.date), expense.expenses.amount];
+        return [index+1, getFormattedDate(expense.date), calculateSum(expense.expenses.amount)];
     });
 
     const content = {
@@ -75,7 +82,7 @@ const createPDF = async(user) =>{
 
     doc.autoTable(content);
 
-    const pdfOutput = doc.output('blob');
+    const pdfOutput = doc.output("datauristring");
 
     return pdfOutput;
 
