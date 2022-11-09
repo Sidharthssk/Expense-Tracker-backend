@@ -2,7 +2,6 @@ const connectToMongo = require('./db');
 const express = require('express');
 const cors = require('cors');
 require("dotenv").config();
-const getExpense = require('./pdfHandlers/getExpense');
 const getUsers = require('./pdfHandlers/getUsers');
 const sendEmail = require('./pdfHandlers/sendMail');
 
@@ -23,23 +22,32 @@ app.get('/', (req, res) => {
 
 })
 
+var date = new Date();
+var millisTill11 = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 0, 0, 0) - date;
+
+if (millisTill11 < 0) {
+    millisTill11 += 86400000;
+}
+
 setInterval(()=>{
 
-  var date = new Date;
-  var oneDayInMs = 1000*60*60*24;
+  date = new Date();
+  millisTill11 = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 0,0,0) - date;
 
-  const totalUsers = getUsers();
+  if(millisTill11<0){
+    millisTill11 += 86400000;
+  }
+
+  if(new Date(date.getTime() + oneDayInMs).getDate() == 1){
+    const totalUsers = getUsers();
     totalUsers.then((users) => {
       users.forEach((user) => {
           sendEmail(user);
       });
   });
+  }
 
-  // if(new Date(date.getTime() + oneDayInMs).getDate() == 1){
-    
-  // }
-
-}, 5000);
+}, millisTill11);
 
 app.listen(port, () => {
   console.log(`ExpenseTracker backend listening on port ${port}`)
