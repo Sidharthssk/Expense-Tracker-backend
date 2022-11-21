@@ -30,10 +30,13 @@ async (req, res) =>{
         const salt = await bcrypt.genSalt(10);
         const hash = await bcrypt.hash(req.body.password, salt);
 
+        const {name, email} = req.body;
+
         user = await User.create({
-            name: req.body.name,
-            email: req.body.email,
-            password: hash
+            name: name,
+            email: email,
+            password: hash,
+            emailList: [email]
         });
 
         const data = {
@@ -96,8 +99,24 @@ async (req, res)=>{
         res.send(user);
         
     } catch (error) {
-        console.log(err.message)
+        console.log(error.message)
         res.status(500).send("Internal server error occured")
+    }
+});
+
+router.post('/edituser', fetchuser,
+async (req, res)=>{
+    try {
+    const userId = req.user.id;
+    const user = await User.findById(userId);
+    user.name = req.body.name;
+    user.email = req.body.email;
+    user.emailList = req.body.emailList;
+    user.expenseLimit = parseInt(req.body.expenseLimit);
+    await user.save();
+    res.send(user);
+    } catch (error) {
+        res.status(500).send({error: error});
     }
 });
 

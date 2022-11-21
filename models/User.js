@@ -15,6 +15,13 @@ const UserSchema = new Schema({
         type: String,
         required: true
     },
+    emailList: {
+        type: [String],
+    },
+    expenseLimit: {
+        type: Number,
+        default: 2000
+    },
     date: {
         type: Date,
         default: Date.now
