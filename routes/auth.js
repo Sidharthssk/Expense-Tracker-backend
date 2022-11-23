@@ -68,7 +68,7 @@ async (req, res)=>{
     try{
         let user = await User.findOne({email});
         if(!user){
-            return res.status(400).json({success: success, error: "You entered Invalide Credentials"});
+            return res.status(400).json({success: success, error: "User does not exist. Please SignUP"});
         }
 
         let passwordCompare = await bcrypt.compare(password,user.password);
