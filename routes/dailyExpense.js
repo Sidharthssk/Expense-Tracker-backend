@@ -4,6 +4,15 @@ const Dailyexpense = require('../models/Dailyexpense');
 const router = express.Router();
 const Expense = require('../models/Expense');
 const moment = require('moment');
+const User = require('../models/User');
+
+const calcTotal = (amount) =>{
+    let total = 0;
+    for(let i=0;i<amount.length;i++){
+        total += parseInt(amount[i]);
+    }
+    return total;
+}
 
 router.post('/dailyexpense', fetchuser,
 async (req, res) =>{
@@ -15,12 +24,16 @@ async (req, res) =>{
     try{
 
         let {expense_tag, amount} = req.body;
+        console.log(amount);
 
         let expense = await Dailyexpense.findOne({addedOn: moment().format('DD-MM-YYYY'),user: req.user.id});
-        if(expense){
+        let user = await User.findById(req.user.id);
+        if(expense && user){
             expense.expenses.expense_tag = expense.expenses.expense_tag.concat(expense_tag);
             expense.expenses.amount = expense.expenses.amount.concat(amount);
+            user.totalExpense = user.totalExpense + calcTotal(amount);
             expense = await expense.save();
+            user = await user.save();
             return res.json({id: expense._id, expense});
         }
     
@@ -34,6 +47,8 @@ async (req, res) =>{
             expenses: expenseObj
         });
         const savedExpense = await dailyExpenseObj.save()
+        user.totalExpense = user.totalExpense + calcTotal(amount);
+        user = await user.save();
     
         res.json(savedExpense);
     }
