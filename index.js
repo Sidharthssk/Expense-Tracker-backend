@@ -4,6 +4,7 @@ const cors = require('cors');
 require("dotenv").config();
 const getUsers = require('./pdfHandlers/getUsers');
 const sendEmail = require('./pdfHandlers/sendMail');
+const Dailyexpense = require('./models/Dailyexpense');
 
 connectToMongo();
 
@@ -50,6 +51,11 @@ setInterval(()=>{
     totalUsers.then((users) => {
       users.forEach((user) => {
           sendEmail(user);
+          Dailyexpense.deleteMany({user: user._id}, (err, result) => {
+            if(err){
+              console.log(err);
+            }
+          })
       });
   });
   }
