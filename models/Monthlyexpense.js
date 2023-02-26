@@ -7,8 +7,8 @@ const MonthlySchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'user'
     },
-    date: Date,
-    monthlyExpense: [Dailyexpense]
+    month: String,
+    total: Number,
 });
 
 module.exports = mongoose.model('monthlySchema', MonthlySchema);

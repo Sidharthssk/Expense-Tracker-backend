@@ -1,6 +1,7 @@
 const express = require('express');
 const fetchuser = require('../middleware/fetchUser');
 const Dailyexpense = require('../models/Dailyexpense');
+const Monthlyexpense = require('../models/Monthlyexpense');
 const router = express.Router();
 const Expense = require('../models/Expense');
 const moment = require('moment');
@@ -28,12 +29,27 @@ async (req, res) =>{
 
         let expense = await Dailyexpense.findOne({addedOn: moment().format('DD-MM-YYYY'),user: req.user.id});
         let user = await User.findById(req.user.id);
+        const date = new Date();
+        const month = date.toLocaleString('default', { month: 'long' });
+
+        let monthlyExpense = await Monthlyexpense.findOne({month: month, user: req.user.id});
+
         if(expense && user){
             expense.expenses.expense_tag = expense.expenses.expense_tag.concat(expense_tag);
             expense.expenses.amount = expense.expenses.amount.concat(amount);
             user.totalExpense = user.totalExpense + calcTotal(amount);
+
+            if(monthlyExpense){
+                monthlyExpense.total = monthlyExpense.total + calcTotal(amount);
+                await monthlyExpense.save();
+            }
+            else{
+                const monthlyExpenseObj = new Monthlyexpense({month: month, total: calcTotal(amount), user: req.user.id});
+                await monthlyExpenseObj.save();
+            }
+
             expense = await expense.save();
-            user = await user.save();
+            await user.save();
             return res.json({id: expense._id, expense});
         }
     
@@ -48,7 +64,17 @@ async (req, res) =>{
         });
         const savedExpense = await dailyExpenseObj.save()
         user.totalExpense = user.totalExpense + calcTotal(amount);
-        user = await user.save();
+
+        if(monthlyExpense){
+            monthlyExpense.total = monthlyExpense.total + calcTotal(amount);
+            await monthlyExpense.save();
+        }
+        else{
+            const monthlyExpenseObj = new Monthlyexpense({month: month, total: calcTotal(amount), user: req.user.id});
+            await monthlyExpenseObj.save();
+        }
+
+        await user.save();
     
         res.json(savedExpense);
     }
