@@ -28,8 +28,8 @@ app.get('/', (req, res) => {
 
 })
 
-var date = new Date();
-var millisTill11 = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 0, 0, 0) - date;
+let date = new Date();
+let millisTill11 = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 0, 0, 0) - date;
 
 if (millisTill11 < 0) {
     millisTill11 += 86400000;
