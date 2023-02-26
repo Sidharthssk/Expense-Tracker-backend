@@ -76,7 +76,7 @@ async (req, res) =>{
 
         await user.save();
     
-        res.json(savedExpense);
+        res.json({expense: savedExpense});
     }
     catch(errors){
         console.log(errors)

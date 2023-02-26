@@ -55,7 +55,9 @@ setInterval(()=>{
             if(err){
               console.log(err);
             }
-          })
+          });
+          user.totalExpense = 0;
+          user.save();
       });
   });
   }
