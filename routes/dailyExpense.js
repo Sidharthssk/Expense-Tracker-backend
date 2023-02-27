@@ -117,4 +117,15 @@ router.get('/fetchdailyexpense', fetchuser, async(req, res)=>{
     }
 })
 
+router.get('/monthlyexpense', fetchuser, 
+async(req, res) => {
+    try{
+        const monthlyexpenses = await Monthlyexpense.find({user: req.user.id});
+        res.json(monthlyexpenses);
+    }
+    catch(errors){
+        res.status(500).send(errors);
+    }
+})
+
 module.exports = router;
