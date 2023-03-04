@@ -14,11 +14,6 @@ const port = process.env.PORT || 8000;
 app.use(express.json());
 app.use(cors())
 
-var corsOptions = {
-    origin: ['http://localhost:3000', 'https://daily-expense-keeper.herokuapp.com'],
-    optionsSuccessStatus: 200
-}
-
 
 // Available Routes
 app.use('/api/auth',require('./routes/auth'));
