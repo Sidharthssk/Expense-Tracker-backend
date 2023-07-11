@@ -23,41 +23,31 @@ app.get('/', (req, res) => {
 
 })
 
-let date = new Date();
-let millisTill11 = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 0, 0, 0) - date;
-
-if (millisTill11 < 0) {
-    millisTill11 += 86400000;
+function getMillisUntillMonthEnd() {
+  const currentDate = new Date();
+  const nextMonthDate = new Date(currentDate.getFullYear(), currentDate.getMonth()+1, 1);
+  const millisTillNextMonth = nextMonthDate - currentDate;
+  return millisTillNextMonth;
 }
 
-setInterval(()=>{
+let millisUntilMonthEnd = getMillisUntillMonthEnd();
 
-  date = new Date();
-  millisTill11 = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 0,0,0) - date;
+const intervalFunc = async() => {
+  const totalUsers = getUsers();
+  const users = await totalUsers;
+  users.forEach(async(user) => {
+    await sendEmail(user);
+    Dailyexpense.deleteMany({user: user._id}, (err, result) => {
+      if(err){
+        console.log(err);
+      }
+    });
+    user.totalExpense = 0;
+    await user.save();
+  })
+}
 
-  if(millisTill11<0){
-    millisTill11 += 86400000;
-  }
-
-  const oneDayInMs = 1000 * 60 * 60 * 24;
-
-  if(new Date(date.getTime() + oneDayInMs).getDate() == 1){
-    const totalUsers = getUsers();
-    totalUsers.then((users) => {
-      users.forEach((user) => {
-          sendEmail(user);
-          Dailyexpense.deleteMany({user: user._id}, (err, result) => {
-            if(err){
-              console.log(err);
-            }
-          });
-          user.totalExpense = 0;
-          user.save();
-      });
-  });
-  }
-
-}, millisTill11);
+setInterval(intervalFunc, millisUntilMonthEnd);
 
 app.listen(port, () => {
   console.log(`ExpenseTracker backend listening on port ${port}`)
